@@ -3,7 +3,6 @@ import os
 
 app = Flask(__name__)
 
-
 def analyze_input(text: str) -> dict:
     score = 0
     triggers = []
@@ -62,7 +61,6 @@ def analyze_input(text: str) -> dict:
         "triggers": triggers
     }
 
-
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html>
@@ -89,10 +87,6 @@ HTML_TEMPLATE = """
         h1 {
             margin-top: 0;
             color: #0f172a;
-        }
-
-        p {
-            line-height: 1.6;
         }
 
         textarea {
@@ -154,12 +148,6 @@ HTML_TEMPLATE = """
             font-size: 13px;
             color: #64748b;
         }
-
-        code {
-            background: #eef2ff;
-            padding: 2px 6px;
-            border-radius: 6px;
-        }
     </style>
 </head>
 <body>
@@ -175,8 +163,7 @@ HTML_TEMPLATE = """
 
         {% if result %}
         <div class="result">
-            <p>
-                Risk Level:
+            <p>Risk Level:
                 <span class="{{ result['risk'].lower() }}">{{ result['risk'] }}</span>
             </p>
             <p>Risk Score: {{ result['score'] }}</p>
@@ -195,14 +182,12 @@ HTML_TEMPLATE = """
         {% endif %}
 
         <div class="footer">
-            API endpoint: <code>/api/analyze</code> |
-            Health check: <code>/health</code>
+            Health check available at /health
         </div>
     </div>
 </body>
 </html>
 """
-
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -219,11 +204,9 @@ def home():
         submitted_text=submitted_text
     )
 
-
 @app.route("/health")
 def health():
     return "ok", 200
-
 
 @app.route("/api/analyze", methods=["POST"])
 def api_analyze():
@@ -234,7 +217,6 @@ def api_analyze():
 
     result = analyze_input(data["text"])
     return jsonify(result)
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
