@@ -3,6 +3,7 @@ import os
 
 app = Flask(__name__)
 
+
 def analyze_input(text: str) -> dict:
     score = 0
     triggers = []
@@ -61,6 +62,7 @@ def analyze_input(text: str) -> dict:
         "triggers": triggers
     }
 
+
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html>
@@ -86,6 +88,11 @@ HTML_TEMPLATE = """
 
         h1 {
             margin-top: 0;
+            color: #0f172a;
+        }
+
+        p {
+            line-height: 1.6;
         }
 
         textarea {
@@ -107,6 +114,7 @@ HTML_TEMPLATE = """
             border: none;
             border-radius: 8px;
             cursor: pointer;
+            font-size: 15px;
         }
 
         button:hover {
@@ -135,6 +143,23 @@ HTML_TEMPLATE = """
             color: #15803d;
             font-weight: bold;
         }
+
+        ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .footer {
+            margin-top: 24px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        code {
+            background: #eef2ff;
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
     </style>
 </head>
 <body>
@@ -143,38 +168,62 @@ HTML_TEMPLATE = """
         <p>A lightweight phishing risk detector for suspicious messages and links.</p>
 
         <form method="POST">
-            <textarea name="text" placeholder="Paste suspicious email text, message, or link here..."></textarea>
+            <textarea name="text" placeholder="Paste suspicious email text, message, or link here...">{{ submitted_text or "" }}</textarea>
             <br>
             <button type="submit">Analyze</button>
         </form>
 
         {% if result %}
         <div class="result">
-            <p>Risk Level: <span class="{{ result['risk'].lower() }}">{{ result['risk'] }}</span></p>
+            <p>
+                Risk Level:
+                <span class="{{ result['risk'].lower() }}">{{ result['risk'] }}</span>
+            </p>
             <p>Risk Score: {{ result['score'] }}</p>
-            <p>Triggers Found: {{ result['triggers'] }}</p>
+            <p>Triggers Found:</p>
+
+            {% if result['triggers'] %}
+                <ul>
+                    {% for trigger in result['triggers'] %}
+                        <li>{{ trigger }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No suspicious triggers found.</p>
+            {% endif %}
         </div>
         {% endif %}
+
+        <div class="footer">
+            API endpoint: <code>/api/analyze</code> |
+            Health check: <code>/health</code>
+        </div>
     </div>
 </body>
 </html>
 """
 
-@app.route("/")
-def index():
-    return "PhishGuard Lite is running"
 
-@app.route("/app", methods=["GET", "POST"])
-def web_app():
+@app.route("/", methods=["GET", "POST"])
+def home():
     result = None
+    submitted_text = ""
+
     if request.method == "POST":
-        text = request.form.get("text", "")
-        result = analyze_input(text)
-    return render_template_string(HTML_TEMPLATE, result=result)
+        submitted_text = request.form.get("text", "")
+        result = analyze_input(submitted_text)
+
+    return render_template_string(
+        HTML_TEMPLATE,
+        result=result,
+        submitted_text=submitted_text
+    )
+
 
 @app.route("/health")
 def health():
     return "ok", 200
+
 
 @app.route("/api/analyze", methods=["POST"])
 def api_analyze():
@@ -185,6 +234,7 @@ def api_analyze():
 
     result = analyze_input(data["text"])
     return jsonify(result)
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
