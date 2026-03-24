@@ -218,6 +218,7 @@ def api_analyze():
     result = analyze_input(data["text"])
     return jsonify(result)
 
+# This is important for Render - the application object should be named 'app'
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
