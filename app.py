@@ -138,6 +138,10 @@ def api_analyze():
 
     return jsonify(result)
 
+@app.route("/health")
+def health():
+    return "ok"
+
 import os
 
 if __name__ == "__main__":
