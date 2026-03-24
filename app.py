@@ -1,7 +1,65 @@
 from flask import Flask, request, render_template_string, jsonify
-from detector import analyze_input
+import os
 
 app = Flask(__name__)
+
+def analyze_input(text: str) -> dict:
+    score = 0
+    triggers = []
+
+    suspicious_keywords = [
+        "verify your account",
+        "urgent action required",
+        "click here",
+        "login immediately",
+        "password reset",
+        "bank alert",
+        "confirm identity",
+        "suspended account",
+        "security notice",
+        "update your payment"
+    ]
+
+    suspicious_domains = [
+        "bit.ly",
+        "tinyurl",
+        "secure-update",
+        "account-verify",
+        "free-login"
+    ]
+
+    lower_text = text.lower()
+
+    for keyword in suspicious_keywords:
+        if keyword in lower_text:
+            score += 1
+            triggers.append(keyword)
+
+    for domain in suspicious_domains:
+        if domain in lower_text:
+            score += 2
+            triggers.append(domain)
+
+    if "http://" in lower_text:
+        score += 1
+        triggers.append("http link")
+
+    if "@" in lower_text:
+        score += 1
+        triggers.append("@ symbol")
+
+    if score >= 5:
+        risk = "High"
+    elif score >= 3:
+        risk = "Medium"
+    else:
+        risk = "Low"
+
+    return {
+        "score": score,
+        "risk": risk,
+        "triggers": triggers
+    }
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -77,10 +135,6 @@ HTML_TEMPLATE = """
             color: #15803d;
             font-weight: bold;
         }
-
-        ul {
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
@@ -96,20 +150,9 @@ HTML_TEMPLATE = """
 
         {% if result %}
         <div class="result">
-            <p>Risk Level:
-                <span class="{{ result['risk'].lower() }}">{{ result['risk'] }}</span>
-            </p>
+            <p>Risk Level: <span class="{{ result['risk'].lower() }}">{{ result['risk'] }}</span></p>
             <p>Risk Score: {{ result['score'] }}</p>
-            <p>Triggers Found:</p>
-            {% if result['triggers'] %}
-                <ul>
-                    {% for trigger in result['triggers'] %}
-                        <li>{{ trigger }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No suspicious triggers found.</p>
-            {% endif %}
+            <p>Triggers Found: {{ result['triggers'] }}</p>
         </div>
         {% endif %}
     </div>
@@ -117,34 +160,32 @@ HTML_TEMPLATE = """
 </html>
 """
 
-@app.route("/", methods=["GET", "POST"])
-def home():
+@app.route("/")
+def index():
+    return "PhishGuard Lite is running"
+
+@app.route("/app", methods=["GET", "POST"])
+def web_app():
     result = None
-
     if request.method == "POST":
-        text = request.form["text"]
+        text = request.form.get("text", "")
         result = analyze_input(text)
-
     return render_template_string(HTML_TEMPLATE, result=result)
+
+@app.route("/health")
+def health():
+    return "ok", 200
 
 @app.route("/api/analyze", methods=["POST"])
 def api_analyze():
-    data = request.get_json()
+    data = request.get_json(silent=True)
 
     if not data or "text" not in data:
         return jsonify({"error": "Missing 'text' field"}), 400
 
     result = analyze_input(data["text"])
-
     return jsonify(result)
-
-@app.route("/health")
-def health():
-    return "ok"
-
-import os
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-    
