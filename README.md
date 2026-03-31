@@ -4,19 +4,28 @@
 
 ![App Screenshot](screenshots/app.png)
 
-PhishGuard Lite is a lightweight cybersecurity tool designed to detect phishing attempts in text messages, emails, and suspicious links using rule-based analysis.
+PhishGuard Lite is a lightweight, interpretable phishing detection and risk scoring framework designed for practical email and message security analysis.
+
+It combines rule-based detection with transparent scoring to provide clear explanations of why a message is considered suspicious.
 
 ---
 
 ## Overview
 
-Phishing remains one of the most common attack vectors in modern cybersecurity threats. This project demonstrates how simple, explainable detection techniques can be used to identify suspicious patterns in user-provided text.
+Phishing attacks remain one of the most common cybersecurity threats, often relying on deceptive language, malicious links, and urgency cues.
 
-The system analyzes input and highlights potential phishing indicators such as urgency, deceptive language, and suspicious URLs, assigning a risk score and classification.
+PhishGuard Lite addresses this problem using a rule-based approach that prioritizes:
+
+- Interpretability
+- Simplicity
+- Lightweight deployment
+- Real-time analysis capability
+
+Unlike black-box models, this system provides clear reasoning behind every detection decision.
 
 ---
 
-## Features
+## Key Features
 
 - Rule-based phishing detection
 - Risk scoring and classification (Low, Medium, High)
@@ -29,16 +38,31 @@ The system analyzes input and highlights potential phishing indicators such as u
 
 ## How It Works
 
-The detection engine scans input text for known phishing indicators, including:
+PhishGuard Lite analyzes input text (emails or messages) using predefined phishing indicators such as:
 
-- Urgent or threatening language
-- Account verification requests
-- Suspicious or shortened URLs
-- Common phishing phrases
+- Suspicious keywords (e.g., "urgent", "verify", "account suspended")  
+- Presence of suspicious links or domains  
+- Request for sensitive information  
+- Social engineering patterns  
 
-Each detected indicator contributes to a cumulative score, which is mapped to a final risk level.
+Each detected signal contributes to a cumulative **risk score**, which determines whether the message is:
+
+- Safe  
+- Suspicious  
+- High Risk  
+
+The system also provides explanations for each decision, making it suitable for real-world use cases where transparency is required.
 
 ---
+## 🖥️ System Architecture
+
+The system consists of:
+
+- Input processing module  
+- Rule-based detection engine  
+- Risk scoring component  
+- Explanation generator  
+- Flask web interface  
 
 ## Installation
 
@@ -46,3 +70,7 @@ Each detected indicator contributes to a cumulative score, which is mapped to a 
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
+
+## 📊 Example Output
+
+Input:
