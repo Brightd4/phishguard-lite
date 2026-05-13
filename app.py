@@ -1,65 +1,8 @@
 from flask import Flask, request, render_template_string, jsonify
+from detector import analyze_input
 import os
 
 app = Flask(__name__)
-
-def analyze_input(text: str) -> dict:
-    score = 0
-    triggers = []
-
-    suspicious_keywords = [
-        "verify your account",
-        "urgent action required",
-        "click here",
-        "login immediately",
-        "password reset",
-        "bank alert",
-        "confirm identity",
-        "suspended account",
-        "security notice",
-        "update your payment"
-    ]
-
-    suspicious_domains = [
-        "bit.ly",
-        "tinyurl",
-        "secure-update",
-        "account-verify",
-        "free-login"
-    ]
-
-    lower_text = text.lower()
-
-    for keyword in suspicious_keywords:
-        if keyword in lower_text:
-            score += 1
-            triggers.append(keyword)
-
-    for domain in suspicious_domains:
-        if domain in lower_text:
-            score += 2
-            triggers.append(domain)
-
-    if "http://" in lower_text:
-        score += 1
-        triggers.append("http link")
-
-    if "@" in lower_text:
-        score += 1
-        triggers.append("@ symbol")
-
-    if score >= 5:
-        risk = "High"
-    elif score >= 3:
-        risk = "Medium"
-    else:
-        risk = "Low"
-
-    return {
-        "score": score,
-        "risk": risk,
-        "triggers": triggers
-    }
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -143,6 +86,19 @@ HTML_TEMPLATE = """
             padding-left: 20px;
         }
 
+        .card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 14px;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #0f172a;
+        }
+
         .footer {
             margin-top: 24px;
             font-size: 13px;
@@ -153,7 +109,7 @@ HTML_TEMPLATE = """
 <body>
     <div class="container">
         <h1>PhishGuard Lite</h1>
-        <p>A lightweight phishing risk detector for suspicious messages and links.</p>
+        <p>A lightweight hybrid phishing risk detector for suspicious messages and links.</p>
 
         <form method="POST">
             <textarea name="text" placeholder="Paste suspicious email text, message, or link here...">{{ submitted_text or "" }}</textarea>
@@ -166,18 +122,63 @@ HTML_TEMPLATE = """
             <p>Risk Level:
                 <span class="{{ result['risk'].lower() }}">{{ result['risk'] }}</span>
             </p>
-            <p>Risk Score: {{ result['score'] }}</p>
-            <p>Triggers Found:</p>
 
-            {% if result['triggers'] %}
-                <ul>
-                    {% for trigger in result['triggers'] %}
-                        <li>{{ trigger }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No suspicious triggers found.</p>
-            {% endif %}
+            <p>Risk Score: {{ result['score'] }}</p>
+
+            <div class="card">
+                <p><span class="label">AI Prediction:</span>
+                    {% if result['ai_prediction'] == 1 %}
+                        Potential Phishing
+                    {% else %}
+                        Likely Safe
+                    {% endif %}
+                </p>
+
+                <p><span class="label">AI Confidence:</span> {{ result['ai_confidence'] }}</p>
+            </div>
+
+            <div class="card">
+                <p class="label">Triggers Found:</p>
+
+                {% set clean_triggers = [] %}
+                {% for trigger in result['triggers'] %}
+                    {% if not trigger.startswith("AI_") %}
+                        {% set _ = clean_triggers.append(trigger) %}
+                    {% endif %}
+                {% endfor %}
+
+                {% if clean_triggers %}
+                    <ul>
+                        {% for trigger in clean_triggers %}
+                            <li>{{ trigger }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No rule-based triggers found.</p>
+                {% endif %}
+            </div>
+
+            <div class="card">
+                <p class="label">Explanation:</p>
+
+                {% if result['triggers'] %}
+                    {% if result['ai_prediction'] == 1 or "AI_SUSPICION_SIGNAL" in result['triggers'] %}
+                        <p>
+                            The analysis identified phishing indicators in the message.
+                            The final risk assessment reflects a combination of rule-based detection
+                            and machine learning inference.
+                        </p>
+                    {% else %}
+                        <p>
+                            The analysis identified phishing indicators based on rule-based detection.
+                        </p>
+                    {% endif %}
+                {% else %}
+                    <p>
+                        No strong phishing indicators were detected in the message.
+                    </p>
+                {% endif %}
+            </div>
         </div>
         {% endif %}
 
@@ -189,14 +190,17 @@ HTML_TEMPLATE = """
 </html>
 """
 
+
 @app.route("/", methods=["GET", "POST"])
 def home():
     result = None
     submitted_text = ""
 
     if request.method == "POST":
-        submitted_text = request.form.get("text", "")
-        result = analyze_input(submitted_text)
+        submitted_text = request.form.get("text", "").strip()
+
+        if submitted_text:
+            result = analyze_input(submitted_text)
 
     return render_template_string(
         HTML_TEMPLATE,
@@ -204,9 +208,11 @@ def home():
         submitted_text=submitted_text
     )
 
+
 @app.route("/health")
 def health():
     return "ok", 200
+
 
 @app.route("/api/analyze", methods=["POST"])
 def api_analyze():
@@ -215,10 +221,15 @@ def api_analyze():
     if not data or "text" not in data:
         return jsonify({"error": "Missing 'text' field"}), 400
 
-    result = analyze_input(data["text"])
+    user_text = data["text"].strip()
+
+    if not user_text:
+        return jsonify({"error": "Text cannot be empty"}), 400
+
+    result = analyze_input(user_text)
     return jsonify(result)
 
-# This is important for Render - the application object should be named 'app'
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
