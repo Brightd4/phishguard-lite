@@ -46,6 +46,8 @@ The system consists of the following major components:
 - Explainability Engine
 - Flask Web Interface
 
+![PhishGuard Lite Architecture](screenshots/phishguard_architecture.png)
+
 ---
 
 ## How It Works
@@ -123,3 +125,10 @@ Clone the repository:
 ```bash
 git clone https://github.com/Brightd4/phishguard-lite.git
 cd phishguard-lite
+
+python -m venv .venv
+.venv\Scripts\activate
+
+pip install -r requirements.txt
+
+python app.py
