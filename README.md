@@ -1,76 +1,125 @@
 # PhishGuard Lite
 
+A Lightweight Hybrid Explainable Phishing Detection System Using Rule Based Analysis and Machine Learning
+
+---
+
 ## Demo
 
 ![App Screenshot](screenshots/app.png)
-
-PhishGuard Lite is a lightweight, interpretable phishing detection and risk scoring framework designed for practical email and message security analysis.
-
-It combines rule-based detection with transparent scoring to provide clear explanations of why a message is considered suspicious.
 
 ---
 
 ## Overview
 
-Phishing attacks remain one of the most common cybersecurity threats, often relying on deceptive language, malicious links, and urgency cues.
+PhishGuard Lite is a lightweight hybrid phishing detection framework designed to identify suspicious emails, SMS messages, and phishing related text using a combination of rule based analysis and machine learning classification.
 
-PhishGuard Lite addresses this problem using a rule-based approach that prioritizes:
+The system combines transparent heuristic detection with a TF IDF + Logistic Regression machine learning model to improve phishing detection while maintaining explainability and low computational overhead.
 
-- Interpretability
-- Simplicity
-- Lightweight deployment
-- Real-time analysis capability
-
-Unlike black-box models, this system provides clear reasoning behind every detection decision.
+Unlike many black box cybersecurity systems, PhishGuard Lite provides interpretable explanations showing why a message was flagged as suspicious.
 
 ---
 
 ## Key Features
 
-- Rule-based phishing detection
-- Risk scoring and classification (Low, Medium, High)
-- Detection of suspicious keywords and domains
-- Explainable output with identified triggers
-- Lightweight Flask-based web interface
-- Real-time analysis of user input
+- Hybrid phishing detection using rule based analysis and machine learning
+- Lightweight Logistic Regression phishing classifier
+- TF IDF feature extraction pipeline
+- Risk scoring and classification
+- Explainable detection output
+- Detection of suspicious keywords and phishing domains
+- Real time Flask web application
+- Fast inference suitable for lightweight deployment
+- Human interpretable trigger explanations
+
+---
+
+## System Architecture
+
+The system consists of the following major components:
+
+- Input Processing Module
+- Rule Based Detection Engine
+- TF IDF Feature Extraction Module
+- Machine Learning Classification Engine
+- Risk Scoring and Fusion Layer
+- Explainability Engine
+- Flask Web Interface
 
 ---
 
 ## How It Works
 
-PhishGuard Lite analyzes input text (emails or messages) using predefined phishing indicators such as:
+PhishGuard Lite analyzes text messages using two complementary approaches.
 
-- Suspicious keywords (e.g., "urgent", "verify", "account suspended")  
-- Presence of suspicious links or domains  
-- Request for sensitive information  
-- Social engineering patterns  
+### Rule Based Detection
 
-Each detected signal contributes to a cumulative **risk score**, which determines whether the message is:
+The rule based engine searches for suspicious phishing indicators including:
 
-- Safe  
-- Suspicious  
-- High Risk  
+- Urgency related phrases
+- Account verification requests
+- Suspicious links
+- Credential harvesting patterns
+- Social engineering indicators
+- Suspicious domains
 
-The system also provides explanations for each decision, making it suitable for real-world use cases where transparency is required.
+Each detected trigger contributes to a cumulative phishing risk score.
+
+### Machine Learning Detection
+
+The machine learning module uses:
+
+- TF IDF vectorization
+- Logistic Regression classification
+
+The model was trained using the SMS Spam Collection dataset and contributes an additional AI based phishing confidence signal.
+
+### Hybrid Risk Assessment
+
+The final risk level combines:
+
+- Rule based trigger scoring
+- AI prediction confidence
+- Suspicious link analysis
+
+The system outputs:
+
+- Risk Score
+- Risk Level
+- Detected Triggers
+- AI Prediction
+- AI Confidence
+- Human readable explanation
 
 ---
-## 🖥️ System Architecture
 
-The system consists of:
+## Technologies Used
 
-- Input processing module  
-- Rule-based detection engine  
-- Risk scoring component  
-- Explanation generator  
-- Flask web interface  
+- Python
+- Flask
+- Scikit learn
+- Pandas
+- NumPy
+- Joblib
+- HTML/CSS
+- JavaScript
+
+---
+
+## Dataset
+
+The machine learning component was trained using the publicly available SMS Spam Collection dataset.
+
+Dataset source:
+
+https://archive.ics.uci.edu/dataset/228/sms+spam+collection
+
+---
 
 ## Installation
 
+Clone the repository:
+
 ```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-
-## 📊 Example Output
-
-Input:
+git clone https://github.com/Brightd4/phishguard-lite.git
+cd phishguard-lite
