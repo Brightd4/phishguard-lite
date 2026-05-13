@@ -110,11 +110,21 @@ The system outputs:
 
 ## Dataset
 
-The machine learning component was trained using the publicly available SMS Spam Collection dataset.
+The machine learning component of PhishGuard Lite was trained using the publicly available SMS Spam Collection dataset.
 
 Dataset source:
 
 https://archive.ics.uci.edu/dataset/228/sms+spam+collection
+
+The original dataset contains SMS messages labeled as either legitimate messages or spam messages. For this project, the labels were converted into numerical form:
+
+- 0 = legitimate message
+- 1 = suspicious or phishing related message
+
+The raw dataset file was placed in:
+
+```text
+datasets/raw/SMSSpamCollection
 
 ---
 
