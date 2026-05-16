@@ -142,3 +142,19 @@ python -m venv .venv
 pip install -r requirements.txt
 
 python app.py
+
+---
+## How to Use
+
+### 1. Open the Live Demo
+
+Visit the deployed application below:
+
+https://phishguard-lite-2.onrender.com
+
+### 2. Paste a Suspicious Message
+
+Example phishing message:
+
+```text
+Urgent action required. Your account has been suspended. Click here to verify your account immediately: http://secure-update-login.com
