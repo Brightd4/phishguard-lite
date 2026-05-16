@@ -7,8 +7,8 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-model_path = BASE_DIR / "../models/phishguard_logistic_model.pkl"
-vectorizer_path = BASE_DIR / "../models/phishguard_tfidf_vectorizer.pkl"
+model_path = BASE_DIR / "models" / "phishguard_logistic_model.pkl"
+vectorizer_path = BASE_DIR / "models" / "phishguard_tfidf_vectorizer.pkl"
 
 model = joblib.load(model_path)
 vectorizer = joblib.load(vectorizer_path)
