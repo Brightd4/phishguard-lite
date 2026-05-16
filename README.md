@@ -3,7 +3,11 @@
 A Lightweight Hybrid Explainable Phishing Detection System Using Rule Based Analysis and Machine Learning
 
 ---
+## Live Demo
 
+https://phishguard-lite-2.onrender.com
+
+---
 ## Demo
 
 ![App Screenshot](screenshots/app.png)
@@ -19,7 +23,13 @@ The system combines transparent heuristic detection with a TF IDF + Logistic Reg
 Unlike many black box cybersecurity systems, PhishGuard Lite provides interpretable explanations showing why a message was flagged as suspicious.
 
 ---
+## Research Motivation
 
+Phishing attacks remain one of the most common cybersecurity threats affecting individuals and organizations worldwide. Many existing phishing detection systems rely on black box machine learning models that provide limited interpretability.
+
+PhishGuard Lite was developed as a lightweight explainable phishing detection framework that combines rule based analysis with machine learning classification to improve transparency, interpretability, and accessibility for educational and research purposes.
+
+---
 ## Key Features
 
 - Hybrid phishing detection using rule based analysis and machine learning
@@ -94,7 +104,20 @@ The system outputs:
 - Human readable explanation
 
 ---
+## Limitations
 
+Current limitations of the system include:
+
+- Limited phishing keyword coverage
+- Lightweight machine learning model
+- English only detection
+- No real time URL reputation analysis
+- Limited adversarial robustness
+- Small scale deployment environment
+
+Future work will focus on transformer based phishing detection, multilingual support, and improved threat intelligence integration.
+
+---
 ## Technologies Used
 
 - Python
@@ -158,3 +181,10 @@ Example phishing message:
 
 ```text
 Urgent action required. Your account has been suspended. Click here to verify your account immediately: http://secure-update-login.com
+
+---
+## Citation
+
+If you use this project in research or educational work, please cite:
+
+Duffour, B. (2026). PhishGuard Lite: A Lightweight Explainable Phishing Detection System.
